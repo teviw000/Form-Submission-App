@@ -1,38 +1,37 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 const SimpleInput = (props) => {
-  const nameInputRef = useRef();
   const [enteredName, setEnteredName] = useState("");
-  const [enteredNameIsValid, setEnteredNameIsValid] = useState(false);
-  const [enterednameTouched, setEnteredNameTouched] = useState();
+  const [enterednameTouched, setEnteredNameTouched] = useState(false);
+
+  const enteredNameIsValid = enteredName.trim() !== "";
+  const nameInputIsInvalid = !enteredNameIsValid && enterednameTouched; // boolean
 
   const nameInputChangeHander = (event) => {
     setEnteredName(event.target.value);
   };
 
+  const nameInputBlurHandler = (event) => {
+    // step 1: if input loses focus, input was definitely touched
+    setEnteredNameTouched(true);
+  };
+
   const formSubmissionHandler = (event) => {
     event.preventDefault();
-    
+
     //all inputs are touched by user by now bc user has to check over before submitting
     setEnteredNameTouched(true);
-    
-    if (enteredName.trim() == "") {
-      //trrim removes white space
-      setEnteredNameIsValid(false);
-      return; //exits if no input and doesnt send in request to server
-    }
 
-    setEnteredNameIsValid(true);
+    if (!enteredNameIsValid) {
+      return;
+    }
 
     console.log(enteredName);
 
-    const enteredValue = nameInputRef.current.value;
-    console.log(enteredValue);
     // nameInputRef.current.value=''; => not ideal, dont manipulate the dom
     setEnteredName("");
+    setEnteredNameTouched(false);
   };
-
-  const nameInputIsInvalid = !enteredNameIsValid && enterednameTouched; // boolean
 
   const nameInputClasses = nameInputIsInvalid
     ? "form-control invalid"
@@ -43,10 +42,10 @@ const SimpleInput = (props) => {
       <div className={nameInputClasses}>
         <label htmlFor="name">Your Name</label>
         <input
-          ref={nameInputRef}
           type="text"
           id="name"
           onChange={nameInputChangeHander}
+          onBlur={nameInputBlurHandler}
           value={enteredName}
         />
         {nameInputIsInvalid && (
