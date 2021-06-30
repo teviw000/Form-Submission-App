@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const SimpleInput = (props) => {
   const nameInputRef = useRef();
   const [enteredName, setEnteredName] = useState("");
-  const [enteredNameIsValid, setEnteredNameIsValid] = useState(true);
+  const [enteredNameIsValid, setEnteredNameIsValid] = useState(false);
+  const [enterednameTouched, setEnteredNameTouched] = useState();
 
   const nameInputChangeHander = (event) => {
     setEnteredName(event.target.value);
@@ -11,7 +12,10 @@ const SimpleInput = (props) => {
 
   const formSubmissionHandler = (event) => {
     event.preventDefault();
-
+    
+    //all inputs are touched by user by now bc user has to check over before submitting
+    setEnteredNameTouched(true);
+    
     if (enteredName.trim() == "") {
       //trrim removes white space
       setEnteredNameIsValid(false);
@@ -28,9 +32,11 @@ const SimpleInput = (props) => {
     setEnteredName("");
   };
 
-  const nameInputClasses = enteredNameIsValid
-    ? "form-control"
-    : "form-control invalid";
+  const nameInputIsInvalid = !enteredNameIsValid && enterednameTouched; // boolean
+
+  const nameInputClasses = nameInputIsInvalid
+    ? "form-control invalid"
+    : "form-control";
 
   return (
     <form onSubmit={formSubmissionHandler}>
@@ -43,7 +49,7 @@ const SimpleInput = (props) => {
           onChange={nameInputChangeHander}
           value={enteredName}
         />
-        {!enteredNameIsValid && (
+        {nameInputIsInvalid && (
           <p className="error-text">Name must not be empty.</p>
         )}
       </div>
